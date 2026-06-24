@@ -1,0 +1,189 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pinnacle Investments - Admin Panel</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body { min-height:100vh; background: #060b1f; color:#f8fafc; }
+    .bg-panel { background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(148, 163, 184, 0.14); }
+    .btn-outline-light { border-color: rgba(255,255,255,.16); }
+    .table thead th { color: #cbd5e1; }
+    .table tbody tr:hover { background: rgba(255,255,255,.04); }
+    /* Improved admin table and actions */
+    .table td, .table th { vertical-align: middle; padding: .9rem .75rem; }
+    .action-btn { min-width:64px; }
+    .btn-action-primary { background: linear-gradient(90deg,#22c55e,#16a34a); border: none; color: #042107; }
+    @media (max-width: 767px) {
+      .table-responsive { overflow-x: auto; }
+      .action-btn { width: 100%; margin-bottom: .5rem; }
+      #userTableBody tr { display: block; border-bottom: 1px solid rgba(255,255,255,.04); margin-bottom: .5rem; }
+      #userTableBody td { display: flex; justify-content: space-between; padding: .5rem 0; }
+    }
+  </style>
+</head>
+<body>
+  <header class="py-4 border-bottom border-white/10">
+    <div class="container d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+      <div>
+        <p class="text-uppercase text-secondary mb-2 small">Admin Panel</p>
+        <h1 class="h3 mb-1">Manage users and balances</h1>
+        <p class="text-secondary mb-0">Add balance, change plans, and review user accounts.</p>
+      </div>
+      <button id="logoutBtn" class="btn btn-sm btn-outline-light">Logout</button>
+    </div>
+  </header>
+
+  <main class="container py-5">
+    <section class="row g-4 mb-4">
+      <div class="col-lg-4">
+        <div class="card bg-panel shadow-sm p-4">
+          <h2 class="h6 text-uppercase text-secondary mb-3">Admin actions</h2>
+          <p class="text-secondary">Use this panel to top up a user balance or update their investment plan.</p>
+          <div class="d-grid gap-2">
+            <button id="refreshUsers" class="btn btn-outline-light">Refresh user list</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-8">
+        <div class="card bg-panel shadow-sm p-4">
+          <h2 class="h6 text-uppercase text-secondary mb-3">Summary</h2>
+          <div class="row g-3">
+            <div class="col-6">
+              <div class="p-3 bg-white/5 rounded-4">
+                <div class="small text-secondary">Total users</div>
+                <div id="totalUsers" class="fs-3 mt-2">0</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3 bg-white/5 rounded-4">
+                <div class="small text-secondary">Admin account</div>
+                <div id="adminRole" class="fs-3 mt-2">Active</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card bg-panel shadow-sm">
+      <div class="card-body p-4">
+        <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 mb-3">
+          <div>
+            <h2 class="h5 mb-1">User accounts</h2>
+            <p class="text-secondary mb-0">Click a row to update a user balance or plan.</p>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-borderless text-white align-middle">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Balance</th>
+                <th>Plan</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const isLocalHost = ['localhost', '127.0.0.1', '::1'].includes(location.hostname) || /^(?:10\.|192\.168\.|172\.(?:1[6-9]|2\d|3[01])\.)/.test(location.hostname);
+    const API_BASE_URL = isLocalHost ? 'http://localhost:3000' : '';
+    const logoutBtn = document.getElementById('logoutBtn');
+    const refreshUsers = document.getElementById('refreshUsers');
+    const userTableBody = document.getElementById('userTableBody');
+    const totalUsers = document.getElementById('totalUsers');
+
+    logoutBtn.addEventListener('click', async () => {
+      await fetch(`${API_BASE_URL}/api/auth/logout`, { method: 'POST', credentials: 'include' });
+      window.location.href = '/admin/login.html';
+    });
+
+    refreshUsers.addEventListener('click', loadUsers);
+
+    async function loadUsers() {
+      const response = await fetch(`${API_BASE_URL}/api/admin/users`, { credentials: 'include' });
+      if (!response.ok) {
+        window.location.href = '/admin/login.html';
+        return;
+      }
+      const { users } = await response.json();
+      userTableBody.innerHTML = '';
+      totalUsers.textContent = users.length;
+
+      users.forEach((user) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><strong>${user.username}</strong></td>
+          <td>${user.email}</td>
+          <td>${user.role}</td>
+          <td>$${Number(user.balance).toFixed(2)}</td>
+          <td>${user.plan}</td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-light me-2" data-id="${user.id}" data-action="balance">Top up</button>
+            <button class="btn btn-sm btn-outline-light" data-id="${user.id}" data-action="plan">Plan</button>
+          </td>
+        `;
+        userTableBody.appendChild(row);
+      });
+
+      userTableBody.querySelectorAll('button').forEach((button) => {
+        button.addEventListener('click', async () => {
+          const id = button.dataset.id;
+          const action = button.dataset.action;
+          if (action === 'balance') {
+            const amount = prompt('Enter amount to add/subtract (use negative value to reduce):', '0');
+            if (amount === null) return;
+            const numeric = Number(amount);
+            if (Number.isNaN(numeric)) {
+              alert('Amount must be a number.');
+              return;
+            }
+            const result = await fetch(`${API_BASE_URL}/api/admin/users/${id}/balance`, {
+              method: 'POST',
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ amount: numeric })
+            });
+            const payload = await result.json();
+            if (!result.ok) {
+              alert(payload.error || 'Could not update balance.');
+              return;
+            }
+            alert(`Balance updated to $${Number(payload.user.balance).toFixed(2)}`);
+            loadUsers();
+          }
+          if (action === 'plan') {
+            const plan = prompt('Enter new plan name:', 'Premium');
+            if (!plan) return;
+            const result = await fetch(`${API_BASE_URL}/api/admin/users/${id}/plan`, {
+              method: 'POST',
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ plan })
+            });
+            const payload = await result.json();
+            if (!result.ok) {
+              alert(payload.error || 'Could not update plan.');
+              return;
+            }
+            alert(`Plan updated to ${payload.user.plan}`);
+            loadUsers();
+          }
+        });
+      });
+    }
+
+    loadUsers();
+  </script>
+</body>
+</html>
+
