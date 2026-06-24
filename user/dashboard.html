@@ -150,7 +150,7 @@
   <script>
     console.log('dashboard.js: executing');
     const isLocalHost = ['localhost', '127.0.0.1', '::1'].includes(location.hostname) || /^(?:10\.|192\.168\.|172\.(?:1[6-9]|2\d|3[01])\.)/.test(location.hostname);
-    const API_BASE_URL = isLocalHost ? 'http://localhost:3000' : '';
+    const API_BASE_URL = isLocalHost ? 'http://localhost:3000' : 'https://pinnacle-backend-xvgi.onrender.com';
     const logoutBtn = document.getElementById('logoutBtn');
     logoutBtn.addEventListener('click', async () => {
       await fetch(`${API_BASE_URL}/api/auth/logout`, { method: 'POST', credentials: 'include' });

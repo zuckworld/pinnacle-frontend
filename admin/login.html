@@ -42,7 +42,7 @@
   </div>
   <script>
     const isLocalHost = ['localhost', '127.0.0.1', '::1'].includes(location.hostname) || /^(?:10\.|192\.168\.|172\.(?:1[6-9]|2\d|3[01])\.)/.test(location.hostname);
-    const API_BASE_URL = isLocalHost ? 'http://localhost:3000' : '';
+    const API_BASE_URL = isLocalHost ? 'http://localhost:3000' : 'https://pinnacle-backend-xvgi.onrender.com';
     const form = document.getElementById('adminLoginForm');
     const alertMessage = document.getElementById('alertMessage');
 
