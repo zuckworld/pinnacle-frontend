@@ -1,5 +1,5 @@
 {
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "https://YOUR_BACKEND_ON_RENDER.onrender.com/api/$1" }
+    { "source": "/api/(.*)", "destination": "https://pinnacle-backend-xvgi.onrender.com/api/$1" }
   ]
 }
