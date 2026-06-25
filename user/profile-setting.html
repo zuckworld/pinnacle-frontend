@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pinnacle Investments - Profile</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root{--primary:#6366f1;--muted:#6b7280;--surface:#f8fafc}
+    body{background:var(--surface);color:#0f172a;font-family:Inter,Arial}
+    .card{background:#fff;border:none;border-radius:14px}
+    .text-secondary{color:#6b7280}
+    .profile-header{background:linear-gradient(135deg,var(--primary),#8b5cf6);color:#fff;border-radius:14px;padding:32px;text-align:center;margin-bottom:24px}
+    .profile-avatar{width:120px;height:120px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:48px;font-weight:700;color:var(--primary)}
+    .stat-card{background:#f8fafc;border-radius:12px;padding:16px;text-align:center;border:1px solid #e6eef7}
+    .stat-value{font-size:24px;font-weight:700;color:var(--primary)}
+    .stat-label{font-size:12px;color:var(--muted);text-transform:uppercase}
+    .section-title{font-size:16px;font-weight:700;margin-bottom:16px}
+    .menu-item{padding:16px;border-radius:12px;border:1px solid #e6eef7;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all .2s}
+    .menu-item:hover{background:#f0f3ff;border-color:var(--primary)}
+    .menu-item-icon{font-size:24px;color:var(--primary)}
+  </style>
+</head>
+<body>
+  <header class="py-2 border-bottom" style="background:#fff">
+    <div class="container">
+      <a href="/user/dashboard.html" class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-left"></i> Back to Dashboard</a>
+    </div>
+  </header>
+
+  <main class="container py-4">
+    <div class="profile-header">
+      <div class="profile-avatar" id="profileAvatar">A</div>
+      <h2 id="fullName" style="margin:0 0 6px 0">User Profile</h2>
+      <p id="profileTitle" style="margin:0;opacity:0.9">Standard Member</p>
+      <div class="mt-3">
+        <span id="kycBadge" class="badge bg-warning text-dark badge-status">KYC: Loading</span>
+        <span id="statusBadge" class="badge bg-info text-dark badge-status">Status: Loading</span>
+        <span id="verifiedBadge" class="badge bg-secondary badge-status">Verified: Loading</span>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="card p-3">
+          <div class="text-secondary small mb-2">Total Balance</div>
+          <div class="h3 mb-0" id="balanceValue">$0.00</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-3">
+          <div class="text-secondary small mb-2">Joined</div>
+          <div class="h5 mb-0" id="createdAt">-</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-3">
+          <div class="text-secondary small mb-2">KYC Status</div>
+          <div class="h5 mb-0" id="kycStatusText">-</div>
+        </div>
+      </div>
+    </div>
+
+    <form id="profileForm" class="card p-4 mb-4">
+      <h6 class="section-title"><i class="bi bi-pencil-square"></i> Edit Profile</h6>
+      <div id="profileMessage" class="alert d-none" role="alert"></div>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">First Name</label>
+          <input id="firstName" class="form-control" name="firstName" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Last Name</label>
+          <input id="lastName" class="form-control" name="lastName" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Email</label>
+          <input id="email" class="form-control" readonly />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Phone Number</label>
+          <input id="phoneNumber" class="form-control" name="phoneNumber" placeholder="+1234567890" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Country</label>
+          <input id="country" class="form-control" readonly />
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Country Code</label>
+          <input id="countryCode" class="form-control" readonly />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">State</label>
+          <input id="state" class="form-control" name="state" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">City</label>
+          <input id="city" class="form-control" name="city" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">ZIP Code</label>
+          <input id="zipCode" class="form-control" name="zipCode" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Address</label>
+          <input id="address" class="form-control" name="address" />
+        </div>
+      </div>
+      <div class="mt-4 d-flex gap-2 flex-wrap">
+        <button type="submit" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="loadProfile()">Reload</button>
+      </div>
+    </form>
+
+    <form id="kycForm" class="card p-4 mb-4">
+      <h6 class="section-title"><i class="bi bi-file-earmark-arrow-up"></i> Upload Identity Documents</h6>
+      <div id="kycMessage" class="alert d-none" role="alert"></div>
+      <div class="row g-3">
+        <div class="col-12 col-md-6">
+          <label class="form-label">Driver's License</label>
+          <input id="driversLicense" type="file" class="form-control" accept="image/*,.pdf" />
+        </div>
+        <div class="col-12 col-md-6">
+          <label class="form-label">Driver's License Number</label>
+          <input id="driversLicenseNumber" class="form-control" name="driversLicenseNumber" />
+        </div>
+        <div class="col-12 col-md-6">
+          <label class="form-label">Passport</label>
+          <input id="passport" type="file" class="form-control" accept="image/*,.pdf" />
+        </div>
+        <div class="col-12 col-md-6">
+          <label class="form-label">Passport Number</label>
+          <input id="passportNumber" class="form-control" name="passportNumber" />
+        </div>
+        <div class="col-12 col-md-6">
+          <label class="form-label">National ID</label>
+          <input id="nationalId" type="file" class="form-control" accept="image/*,.pdf" />
+        </div>
+        <div class="col-12 col-md-6">
+          <label class="form-label">National ID Number</label>
+          <input id="nationalIdNumber" class="form-control" name="nationalIdNumber" />
+        </div>
+      </div>
+      <div class="mt-4 d-flex gap-2 flex-wrap">
+        <button type="submit" class="btn btn-primary">Upload documents</button>
+      </div>
+    </form>
+
+    <div class="card p-4">
+      <h6 class="section-title"><i class="bi bi-box-arrow-right"></i> Danger Zone</h6>
+      <button class="btn btn-outline-danger w-100" onclick="logout()">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </button>
+    </div>
+  </main>
+
+  <nav class="bottom-nav" style="position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #e6eef7;display:flex;gap:0;z-index:60">
+    <a href="/user/dashboard.html" style="flex:1;padding:10px 6px;text-align:center;color:#6b7280;text-decoration:none;font-size:.9rem"><i class="bi bi-house-door-fill" style="display:block;font-size:18px"></i>Home</a>
+    <a href="/user/trending.html" style="flex:1;padding:10px 6px;text-align:center;color:#6b7280;text-decoration:none;font-size:.9rem"><i class="bi bi-graph-up" style="display:block;font-size:18px"></i>Trending</a>
+    <a href="/user/swap.html" style="flex:1;padding:10px 6px;text-align:center;color:#6b7280;text-decoration:none;font-size:.9rem"><i class="bi bi-arrow-left-right" style="display:block;font-size:18px"></i>Swap</a>
+    <a href="/user/backup.html" style="flex:1;padding:10px 6px;text-align:center;color:#6b7280;text-decoration:none;font-size:.9rem"><i class="bi bi-shield-lock" style="display:block;font-size:18px"></i>Backup</a>
+    <a href="/user/profile-setting.html" style="flex:1;padding:10px 6px;text-align:center;color:var(--primary);text-decoration:none;font-size:.9rem;border-top:3px solid var(--primary);background:linear-gradient(180deg, #ffffff, #fbfdff)"><i class="bi bi-person" style="display:block;font-size:18px"></i>Profile</a>
+  </nav>
+
+  <script>
+    const API_BASE_URL = '';
+    const profileForm = document.getElementById('profileForm');
+    const kycForm = document.getElementById('kycForm');
+    const profileMessage = document.getElementById('profileMessage');
+    const kycMessage = document.getElementById('kycMessage');
+
+    function showMessage(element, message, type='success') {
+      element.className = `alert alert-${type}`;
+      element.textContent = message;
+      element.classList.remove('d-none');
+      setTimeout(() => element.classList.add('d-none'), 5000);
+    }
+
+    async function logout() {
+      if (confirm('Are you sure?')) {
+        await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+        window.location.href = '/user/login.html';
+      }
+    }
+
+    async function loadProfile() {
+      const res = await fetch('/api/auth/me', { credentials: 'include' });
+      if (!res.ok) {
+        window.location.href = '/user/login.html';
+        return;
+      }
+      const { user } = await res.json();
+      document.getElementById('fullName').textContent = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'User';
+      document.getElementById('profileTitle').textContent = user.role === 'admin' ? 'Admin Account' : 'Standard Member';
+      document.getElementById('profileAvatar').textContent = (user.firstName || user.username || 'U')[0].toUpperCase();
+      document.getElementById('balanceValue').textContent = `$${Number(user.currentBalance || user.balance || 0).toFixed(2)}`;
+      document.getElementById('createdAt').textContent = new Date(user.created_at).toLocaleDateString();
+      document.getElementById('email').value = user.email || '';
+      document.getElementById('firstName').value = user.firstName || '';
+      document.getElementById('lastName').value = user.lastName || '';
+      document.getElementById('phoneNumber').value = user.phoneNumber || '';
+      document.getElementById('country').value = user.country || '';
+      document.getElementById('countryCode').value = user.countryCode || '';
+      document.getElementById('state').value = user.state || '';
+      document.getElementById('city').value = user.city || '';
+      document.getElementById('zipCode').value = user.zipCode || '';
+      document.getElementById('address').value = user.address || '';
+      document.getElementById('kycBadge').textContent = `KYC: ${user.kycStatus}`;
+      document.getElementById('statusBadge').textContent = `Status: ${user.accountStatus}`;
+      document.getElementById('verifiedBadge').textContent = user.verifiedAt ? `Verified: ${new Date(user.verifiedAt).toLocaleDateString()}` : 'Verified: No';
+      document.getElementById('kycStatusText').textContent = user.kycStatus.replace('_', ' ');
+    }
+
+    profileForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const payload = {
+        firstName: document.getElementById('firstName').value.trim(),
+        lastName: document.getElementById('lastName').value.trim(),
+        phoneNumber: document.getElementById('phoneNumber').value.trim(),
+        state: document.getElementById('state').value.trim(),
+        city: document.getElementById('city').value.trim(),
+        zipCode: document.getElementById('zipCode').value.trim(),
+        address: document.getElementById('address').value.trim()
+      };
+      const res = await fetch('/api/auth/profile', {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showMessage(profileMessage, data.error || 'Unable to update profile.', 'danger');
+        return;
+      }
+      showMessage(profileMessage, 'Profile updated successfully.', 'success');
+      loadProfile();
+    });
+
+    kycForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = new FormData();
+      const driversLicenseFile = document.getElementById('driversLicense').files[0];
+      const passportFile = document.getElementById('passport').files[0];
+      const nationalIdFile = document.getElementById('nationalId').files[0];
+      if (driversLicenseFile) formData.append('driversLicense', driversLicenseFile);
+      if (passportFile) formData.append('passport', passportFile);
+      if (nationalIdFile) formData.append('nationalId', nationalIdFile);
+      formData.append('driversLicenseNumber', document.getElementById('driversLicenseNumber').value.trim());
+      formData.append('passportNumber', document.getElementById('passportNumber').value.trim());
+      formData.append('nationalIdNumber', document.getElementById('nationalIdNumber').value.trim());
+      const res = await fetch('/api/auth/kyc-upload', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showMessage(kycMessage, data.error || 'Unable to upload KYC documents.', 'danger');
+        return;
+      }
+      showMessage(kycMessage, 'KYC documents uploaded successfully.', 'success');
+      loadProfile();
+    });
+
+    loadProfile();
+  </script>
+</body>
+</html>
